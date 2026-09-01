@@ -2,30 +2,34 @@ async function getPokemons() {
     const pokemons = [];
 
     for (let i = 1; i <= 9; i++) {
-        const response = await fetch(`https://pokeapi.co{i}`);
-        const data = await response.json();
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+            const data = await response.json();
 
-        const speciesResponse = await fetch(`https://pokeapi.co{i}`);
-        const speciesData = await speciesResponse.json();
+            const speciesResponse = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${i}`);
+            const speciesData = await speciesResponse.json();
 
-        pokemons.push({
-            name: data.name,
-            image: data.sprites.other["official-artwork"].front_default,
-            types: data.types.map(t => t.type.name).join(", "),
-            generation: speciesData.generation.name
-        });
+            pokemons.push({
+                name: data.name,
+                image: data.sprites.other["official-artwork"].front_default,
+                types: data.types.map(t => t.type.name).join(", "),
+                generation: speciesData.generation.name
+            });
+        } catch (error) {
+            console.error(`Error obteniendo el pokémon ${i}:`, error);
+        }
     }
 
     console.log('Pokemons:', pokemons);
     return pokemons;
 }
 
-function renderPokemons(pokemons) {
-    console.log("Rendering pokemons:", pokemons);
-    let cardHTML = "";
-    console.log("Card HTML:", cardHTML);
-    pokemons.forEach(pokemon => {
-        cardHTML += `
+function pintarPokemones(pokemones) {
+    console.log("Pintando pokemones:", pokemones);
+    let tarjetasHTML = "";
+    
+    pokemones.forEach(pokemon => {
+        tarjetasHTML += `
         <div class="card">
             <img src="${pokemon.image}" alt="${pokemon.name}">
             <h3>${pokemon.name}</h3>
@@ -34,7 +38,6 @@ function renderPokemons(pokemons) {
         </div>
         `;
     });
-    document.getElementById("main-container").innerHTML = cardHTML;
+    document.getElementById("main-container").innerHTML = tarjetasHTML;
 }
-
-getPokemons().then(renderPokemons);
+getPokemons().then(pintarPokemones);
